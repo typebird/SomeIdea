@@ -1,0 +1,15 @@
+[package]
+name = "someidea"
+version = "0.1.0"
+authors = ["竹鳥 <32059290+typebird@users.noreply.github.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rand = "*"
+
+[dependencies.cursive] 
+version = "0.16"
+default-features = false
+features = ["crossterm-backend"]
