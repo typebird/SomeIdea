@@ -1,5 +1,8 @@
+mod generator;
 mod interface;
 
 fn main() {
-    let _app = interface::AppInterface::new();
+    let mut app = interface::AppInterface::new();
+
+    app.run();
 }
