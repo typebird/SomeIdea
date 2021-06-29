@@ -1,10 +1,14 @@
 use cursive::traits::*;
-use cursive::views::{BoxedView, Dialog, LinearLayout, NamedView, ResizedView, SelectView};
+use cursive::views::{
+    BoxedView, Checkbox, Dialog, DummyView, EditView, LinearLayout, ListView, NamedView,
+    ResizedView, SelectView,
+};
 use cursive::Cursive;
+
 use std::cmp::PartialEq;
 use std::fmt;
 
-use crate::generator::{self, Chords};
+use crate::generator::{self, MusicChordTypes, MusicNotes};
 
 /// 頁面列表。
 #[derive(PartialEq)]
@@ -71,6 +75,12 @@ impl AppInterface {
     }
 
     pub fn run(&mut self) {
+        cursive::logger::init();
+        // log::error!("Something serious probably happened!");
+        // log::warn!("Or did it?");
+        // log::debug!("Logger initialized.");
+        // log::info!("Starting!");
+
         let layout: ResizedView<NamedView<LinearLayout>> = LinearLayout::horizontal()
             .child(AppInterface::get_left_menu())
             .child(AppInterface::get_gerenator_view())
@@ -82,6 +92,8 @@ impl AppInterface {
         siv.add_layer(BoxedView::boxed(layout));
 
         siv.add_global_callback('q', AppInterface::use_want_quit);
+        siv.add_global_callback('~', cursive::Cursive::toggle_debug_console);
+        // siv.add_global_callback('l', |_| log::trace!("Wooo"));
 
         siv.run();
     }
@@ -145,10 +157,10 @@ impl AppInterface {
         generator_view.add_child(view);
     }
 
-    fn get_gerenator_view() -> NamedView<BoxedView> {
+    fn get_gerenator_view() -> BoxedView {
         let content = AppInterface::get_start_page();
 
-        BoxedView::boxed(content).with_name("generator_view")
+        BoxedView::boxed(content) //.with_name("generator_view")
     }
 
     fn use_want_quit(siv: &mut Cursive) {
@@ -168,11 +180,31 @@ impl AppInterface {
     }
 
     fn get_random_notes_generator() -> BoxedView {
-        let info = Dialog::text("this is what you got!");
-        let result = generator::get_random_notes();
-        let layout = LinearLayout::vertical()
-            .child(info)
-            .child(Dialog::text(format!("You meter is: {}", result)).full_height())
+        let control_box = Dialog::around(
+            ListView::new()
+                .child("數量", EditView::new())
+                .child("", DummyView)
+                .child("C ", Checkbox::new().checked().with_name("note_C"))
+                .child("Db", Checkbox::new().checked().with_name("note_Db"))
+                .child("D ", Checkbox::new().checked().with_name("note_D"))
+                .child("Eb", Checkbox::new().checked().with_name("note_Eb"))
+                .child("E ", Checkbox::new().checked().with_name("note_E"))
+                .child("F ", Checkbox::new().checked().with_name("note_F"))
+                .child("F#", Checkbox::new().checked().with_name("note_Fs"))
+                .child("G ", Checkbox::new().checked().with_name("note_G"))
+                .child("Ab", Checkbox::new().checked().with_name("note_Ab"))
+                .child("A ", Checkbox::new().checked().with_name("note_A"))
+                .child("Bb", Checkbox::new().checked().with_name("note_Bb"))
+                .child("B ", Checkbox::new().checked().with_name("note_B ")),
+        )
+        .title("choose you want")
+        .full_height()
+        .scrollable();
+
+        let default_result = generator::get_random_notes(8);
+        let layout = LinearLayout::horizontal()
+            .child(control_box)
+            .child(Dialog::text(format!("You notes is: {}", default_result)).full_width())
             .full_screen();
 
         BoxedView::boxed(layout)
@@ -180,7 +212,7 @@ impl AppInterface {
 
     fn get_random_chords_generator() -> BoxedView {
         let info = Dialog::text("this is what you got!");
-        let result = generator::get_random_chords(Chords::default());
+        let result = generator::get_random_chords(MusicChordTypes::default(), 8);
         let layout = LinearLayout::vertical()
             .child(info)
             .child(Dialog::text(format!("You chords is: {}", result)).full_height())
@@ -224,7 +256,7 @@ impl AppInterface {
 
     fn get_random_tempo_generator() -> BoxedView {
         let info = Dialog::text("this is what you got!");
-        let result = generator::get_random_number(30, 210);
+        let result = generator::get_random_tempo();
         let layout = LinearLayout::vertical()
             .child(info)
             .child(Dialog::text(format!("You tempo is: {}", result)).full_height())
