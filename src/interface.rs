@@ -1,7 +1,7 @@
 use cursive::traits::*;
 use cursive::views::{
-    BoxedView, Checkbox, Dialog, DummyView, EditView, LinearLayout, ListView, NamedView,
-    ResizedView, SelectView,
+    BoxedView, Button, Checkbox, Dialog, DummyView, EditView, LinearLayout, ListView, NamedView,
+    ResizedView, SelectView, TextView, ViewRef,
 };
 use cursive::Cursive;
 
@@ -116,9 +116,9 @@ impl AppInterface {
 
         Dialog::around(
             left_menu
-                // .scrollable()
                 .fixed_size((20, 11))
-                .with_name("left_menu"),
+                .with_name("left_menu")
+                .scrollable(),
         )
         .title("目錄")
     }
@@ -173,6 +173,12 @@ impl AppInterface {
         siv.add_layer(message);
     }
 
+    fn use_show_tips(siv: &mut Cursive, message: &str) {
+        siv.add_layer(Dialog::text(message).button("關閉", |s| {
+            s.pop_layer();
+        }))
+    }
+
     fn get_start_page() -> BoxedView {
         let content = Dialog::text("welcome to SomeIdea!").full_screen();
 
@@ -181,30 +187,107 @@ impl AppInterface {
 
     fn get_random_notes_generator() -> BoxedView {
         let control_box = Dialog::around(
-            ListView::new()
-                .child("數量", EditView::new())
-                .child("", DummyView)
-                .child("C ", Checkbox::new().checked().with_name("note_C"))
-                .child("Db", Checkbox::new().checked().with_name("note_Db"))
-                .child("D ", Checkbox::new().checked().with_name("note_D"))
-                .child("Eb", Checkbox::new().checked().with_name("note_Eb"))
-                .child("E ", Checkbox::new().checked().with_name("note_E"))
-                .child("F ", Checkbox::new().checked().with_name("note_F"))
-                .child("F#", Checkbox::new().checked().with_name("note_Fs"))
-                .child("G ", Checkbox::new().checked().with_name("note_G"))
-                .child("Ab", Checkbox::new().checked().with_name("note_Ab"))
-                .child("A ", Checkbox::new().checked().with_name("note_A"))
-                .child("Bb", Checkbox::new().checked().with_name("note_Bb"))
-                .child("B ", Checkbox::new().checked().with_name("note_B ")),
+            LinearLayout::vertical()
+                .child(Button::new("random", |s| {
+                    let number_input_box: ViewRef<EditView> =
+                        s.find_name("random_notes_number").unwrap();
+                    let input_number = match number_input_box.get_content().parse::<usize>() {
+                        Ok(num) => {
+                            if num == 0 {
+                                AppInterface::use_show_tips(s,"數量欄位請填入大於零的整數。");
+                                0
+                            } else {
+                                num
+                            }
+                        },
+                        Err(error_message) => {
+                            AppInterface::use_show_tips(s,&format!(
+                                    "解析輸入的數量值時發生錯誤，請確認輸入的內容僅包含不為零的數字\n\
+                                     ，此程式並不支援空格或其他特殊符號。\n\n錯誤細節：\n\n{}",
+                                    error_message
+                                ));
+                            0
+                        }
+                    };
+
+                    if input_number == 0 {
+                        return;
+                    }
+
+                    let default_list = MusicNotes::default();
+                    let choose_notes: Vec<MusicNotes> = (0..12)
+                        .filter_map(|index| {
+                            let is_need = s
+                                .find_name::<Checkbox>(&format!("note_check_{}", index))
+                                .unwrap()
+                                .is_checked();
+
+                            if is_need {
+                                Some(default_list[index])
+                            } else {
+                                None
+                            }
+                        })
+                        .collect();
+
+                    if choose_notes.len() == 0 {
+                        AppInterface::use_show_tips(s,"請選擇至少一個音符。" );
+
+                        return;
+                    }
+
+                    let mut output_box: ViewRef<Dialog> =
+                        s.find_name("random_notes_output").unwrap();
+                    let new_random_data = generator::get_random_notes(input_number,choose_notes);
+                    output_box
+                        .set_content(TextView::new(format!("You notes is: {}", new_random_data)));
+                }))
+                .child(DummyView)
+                .child(
+                    ListView::new().child(
+                        "數量",
+                        EditView::new()
+                            .content("8")
+                            .with_name("random_notes_number"),
+                    ),
+                )
+                .child(DummyView)
+                .child(
+                    LinearLayout::horizontal()
+                        .child(
+                            ListView::new()
+                                .child("C ", Checkbox::new().checked().with_name("note_check_0"))
+                                .child("Db", Checkbox::new().checked().with_name("note_check_1"))
+                                .child("D ", Checkbox::new().checked().with_name("note_check_2"))
+                                .child("Eb", Checkbox::new().checked().with_name("note_check_3"))
+                                .child("E ", Checkbox::new().checked().with_name("note_check_4"))
+                                .child("F ", Checkbox::new().checked().with_name("note_check_5"))
+                        )
+                        .child(DummyView)
+                        .child(DummyView)
+                        .child(
+                            ListView::new()
+                                .child("F#", Checkbox::new().checked().with_name("note_check_6"))
+                                .child("G ", Checkbox::new().checked().with_name("note_check_7"))
+                                .child("Ab", Checkbox::new().checked().with_name("note_check_8"))
+                                .child("A ", Checkbox::new().checked().with_name("note_check_9"))
+                                .child("Bb", Checkbox::new().checked().with_name("note_check_10"))
+                                .child("B ", Checkbox::new().checked().with_name("note_check_11"))
+                        ),
+                ),
         )
         .title("choose you want")
         .full_height()
         .scrollable();
 
-        let default_result = generator::get_random_notes(8);
+        let default_result = generator::get_random_notes(8, MusicNotes::default());
         let layout = LinearLayout::horizontal()
             .child(control_box)
-            .child(Dialog::text(format!("You notes is: {}", default_result)).full_width())
+            .child(
+                Dialog::text(format!("You notes is: {}", default_result))
+                    .with_name("random_notes_output")
+                    .full_width(),
+            )
             .full_screen();
 
         BoxedView::boxed(layout)

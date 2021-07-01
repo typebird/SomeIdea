@@ -30,7 +30,7 @@ impl fmt::Display for MusicNotes {
                 MusicNotes::Eb => "Eb",
                 MusicNotes::E => "E",
                 MusicNotes::F => "F",
-                MusicNotes::Fs => "Fs",
+                MusicNotes::Fs => "F#",
                 MusicNotes::G => "G",
                 MusicNotes::Ab => "Ab",
                 MusicNotes::A => "A",

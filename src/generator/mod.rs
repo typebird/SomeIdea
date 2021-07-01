@@ -17,8 +17,8 @@ pub fn get_random_tempo() -> usize {
 }
 
 /// 取得隨機的音符列表。
-pub fn get_random_notes(number: usize) -> String {
-    music_notes::get_random_notes(MusicNotes::default(), number)
+pub fn get_random_notes(number: usize, use_notes: Vec<MusicNotes>) -> String {
+    music_notes::get_random_notes(use_notes, number)
 }
 
 pub fn get_random_modes() -> String {
