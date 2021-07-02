@@ -66,12 +66,13 @@ fn use_change_content_by_input(siv: &mut Cursive) {
     }
 
     let new_random_data = generator::get_random_notes(input_number, choose_notes);
-    siv.find_name::<Dialog>("random_notes_output")
+    siv.find_name::<Dialog>("random_notes_display")
         .unwrap()
         .set_content(TextView::new(new_random_data));
 }
 
-pub fn main() -> BoxedView {
+/// 側邊功能區。
+fn side_control_area() -> BoxedView {
     let notes_check_list = LinearLayout::horizontal()
         .child(
             ListView::new()
@@ -149,12 +150,16 @@ pub fn main() -> BoxedView {
     .full_height()
     .scrollable();
 
+    BoxedView::boxed(control_box)
+}
+
+pub fn main() -> BoxedView {
     let layout = LinearLayout::horizontal()
-        .child(control_box)
+        .child(side_control_area())
         .child(
             Dialog::text(generator::get_random_notes_by_default())
                 .title("result")
-                .with_name("random_notes_output")
+                .with_name("random_notes_display")
                 .full_width(),
         )
         .full_screen();

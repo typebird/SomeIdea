@@ -1,3 +1,4 @@
+mod random_chords;
 mod random_notes;
 mod widget;
 
@@ -142,8 +143,8 @@ impl AppInterface {
             Pages::Empty => None,
             Pages::Quit => None,
             Pages::Start => Some(AppInterface::get_start_page()),
-            Pages::RandomNotes => Some(AppInterface::get_random_notes_generator()),
-            Pages::RandomChords => Some(AppInterface::get_random_chords_generator()),
+            Pages::RandomNotes => Some(random_notes::main()),
+            Pages::RandomChords => Some(random_chords::main()),
             Pages::RandomKeys => Some(AppInterface::get_random_keys_generator()),
             Pages::RandomModes => Some(AppInterface::get_random_modes_generator()),
             Pages::RandomMeter => Some(AppInterface::get_random_meter_generator()),
@@ -167,40 +168,20 @@ impl AppInterface {
     }
 
     fn use_want_quit(siv: &mut Cursive) {
-        let message = Dialog::text("did you want to quit this app?")
-            .button("Yes", |s| s.quit())
-            .button("No", |s| {
+        let message = Dialog::text("確定要退出程式嗎？")
+            .button("確定", |s| s.quit())
+            .button("取消", |s| {
                 s.pop_layer();
-            });
+            })
+            .title("Quit");
 
         siv.add_layer(message);
-    }
-
-    fn use_show_tips(siv: &mut Cursive, message: &str) {
-        siv.add_layer(Dialog::text(message).button("關閉", |s| {
-            s.pop_layer();
-        }))
     }
 
     fn get_start_page() -> BoxedView {
         let content = Dialog::text("welcome to SomeIdea!").full_screen();
 
         BoxedView::boxed(content)
-    }
-
-    fn get_random_notes_generator() -> BoxedView {
-        random_notes::main()
-    }
-
-    fn get_random_chords_generator() -> BoxedView {
-        let info = Dialog::text("this is what you got!");
-        let result = generator::get_random_chords(MusicChordTypes::default(), 8);
-        let layout = LinearLayout::vertical()
-            .child(info)
-            .child(Dialog::text(format!("You chords is: {}", result)).full_height())
-            .full_screen();
-
-        BoxedView::boxed(layout)
     }
 
     fn get_random_keys_generator() -> BoxedView {
