@@ -21,6 +21,10 @@ pub fn get_random_notes(number: usize, use_notes: Vec<MusicNotes>) -> String {
     music_notes::get_random_notes(use_notes, number)
 }
 
+pub fn get_random_notes_by_default() -> String {
+    music_notes::get_random_notes(MusicNotes::default(), 8)
+}
+
 pub fn get_random_modes() -> String {
     let roots = vec![
         "C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B",
