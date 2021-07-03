@@ -1,10 +1,6 @@
 use cursive::traits::*;
 use cursive::view::IntoBoxedView;
-use cursive::views::ScrollView;
-use cursive::views::{
-    BoxedView, Button, Checkbox, Dialog, DummyView, EditView, LinearLayout, ListView, NamedView,
-    ResizedView, SelectView, TextView, ViewRef,
-};
+use cursive::views::{BoxedView, Dialog};
 use cursive::Cursive;
 
 pub fn use_show_message(siv: &mut Cursive, message: &str) {

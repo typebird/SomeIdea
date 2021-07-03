@@ -8,8 +8,6 @@ use cursive::Cursive;
 use std::cmp::PartialEq;
 use std::fmt;
 
-use crate::generator;
-
 /// 頁面列表。
 #[derive(PartialEq)]
 enum Pages {
@@ -143,8 +141,8 @@ impl AppInterface {
             Pages::RandomChords => Some(music::random_chords::main()),
             Pages::RandomKeys => Some(music::random_keys::main()),
             Pages::RandomModes => Some(music::random_modes::main()),
-            Pages::RandomMeter => Some(AppInterface::get_random_meter_generator()),
-            Pages::RandomTempo => Some(AppInterface::get_random_tempo_generator()),
+            Pages::RandomMeter => Some(music::random_meter::main()),
+            Pages::RandomTempo => Some(music::random_tempo::main()),
             // Pages::RandomTitle => Some(AppInterface::get_random_title_generator()),
             // Pages::RandomIdea => Some(AppInterface::get_random_idea_generator()),
         }
@@ -178,27 +176,5 @@ impl AppInterface {
         let content = Dialog::text("welcome to SomeIdea!").full_screen();
 
         BoxedView::boxed(content)
-    }
-
-    fn get_random_meter_generator() -> BoxedView {
-        let info = Dialog::text("this is what you got!");
-        let result = generator::get_random_meter();
-        let layout = LinearLayout::vertical()
-            .child(info)
-            .child(Dialog::text(format!("You meter is: {}", result)).full_height())
-            .full_screen();
-
-        BoxedView::boxed(layout)
-    }
-
-    fn get_random_tempo_generator() -> BoxedView {
-        let info = Dialog::text("this is what you got!");
-        let result = generator::get_random_tempo();
-        let layout = LinearLayout::vertical()
-            .child(info)
-            .child(Dialog::text(format!("You tempo is: {}", result)).full_height())
-            .full_screen();
-
-        BoxedView::boxed(layout)
     }
 }
