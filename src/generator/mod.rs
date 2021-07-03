@@ -1,46 +1,17 @@
 mod music_chords;
+mod music_modes;
 mod music_notes;
 mod random;
 
 use rand::{self, Rng};
 
-pub use music_chords::MusicChordTypes;
-pub use music_notes::MusicNotes;
-
-pub fn get_random_chords(match_list: Vec<MusicChordTypes>, number: usize) -> String {
-    music_chords::get_random_chords(match_list, number)
-}
+pub use music_chords::*;
+pub use music_modes::*;
+pub use music_notes::*;
 
 /// 取得隨機的速度值（在 30 到 210 之間）。
 pub fn get_random_tempo() -> usize {
     random::get_random_number(30, 210)
-}
-
-/// 取得隨機的音符列表。
-pub fn get_random_notes(number: usize, use_notes: Vec<MusicNotes>) -> String {
-    music_notes::get_random_notes(use_notes, number)
-}
-
-pub fn get_random_notes_by_default() -> String {
-    music_notes::get_random_notes(MusicNotes::default(), 8)
-}
-
-pub fn get_random_modes() -> String {
-    let roots = vec![
-        "C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B",
-    ];
-
-    let modes = vec![
-        "Ionian",
-        "Dorian",
-        "Phrygian",
-        "Lydian",
-        "Mixolydian",
-        "Aeolian",
-        "Locrian",
-    ];
-
-    format!("{} {}", get_random_item(&roots), get_random_item(&modes))
 }
 
 pub fn get_random_meter() -> &'static str {

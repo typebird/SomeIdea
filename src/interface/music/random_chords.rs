@@ -28,7 +28,7 @@ fn get_chords_number_input(siv: &mut Cursive) -> usize {
 }
 
 /// 取得控制介面勾選框的狀態。
-fn get_all_chords_status(siv: &mut Cursive) -> Vec<MusicChordTypes> {
+fn get_all_check_status(siv: &mut Cursive) -> Vec<MusicChordTypes> {
     let default_vec = MusicChordTypes::default();
 
     (0..default_vec.len())
@@ -49,14 +49,14 @@ fn get_all_chords_status(siv: &mut Cursive) -> Vec<MusicChordTypes> {
 /// 以對應名稱取得功能區個欄位的值，並據以更改顯示內容。
 ///
 /// 如果檢查到任何不符合規則的輸入參數，便提前停止。
-fn use_change_display_by_controler(siv: &mut Cursive) {
+fn use_change_display(siv: &mut Cursive) {
     let user_number = get_chords_number_input(siv);
 
     if user_number == 0 {
         return;
     }
 
-    let user_choose = get_all_chords_status(siv);
+    let user_choose = get_all_check_status(siv);
 
     if user_choose.len() == 0 {
         widget::use_show_message(siv, "請選擇至少一個類型。");
@@ -72,7 +72,7 @@ fn use_change_display_by_controler(siv: &mut Cursive) {
 }
 
 /// 側邊控制欄。
-fn side_control_area() -> BoxedView {
+fn get_controller_view() -> BoxedView {
     let chords_check_list = MusicChordTypes::default().iter().enumerate().fold(
         ListView::new(),
         |list, (index, chord)| {
@@ -85,9 +85,9 @@ fn side_control_area() -> BoxedView {
         },
     );
 
-    let control = Dialog::around(
+    widget::get_controller_frame(
         LinearLayout::vertical()
-            .child(Button::new("random", use_change_display_by_controler))
+            .child(Button::new("更新", use_change_display))
             .child(DummyView)
             .child(
                 ListView::new().child(
@@ -100,18 +100,13 @@ fn side_control_area() -> BoxedView {
             .child(DummyView)
             .child(chords_check_list),
     )
-    .title("control")
-    .scrollable()
-    .with_name("random_chords_control");
-
-    BoxedView::boxed(control)
 }
 
 pub fn main() -> BoxedView {
-    let result = generator::get_random_chords(MusicChordTypes::default(), 8);
-    let control = side_control_area();
+    let result = generator::get_random_chords_by_default();
+    let control = get_controller_view();
     let display = Dialog::text(result)
-        .title("result")
+        .title("隨機的旋律")
         .with_name("random_chords_display")
         .full_width();
 

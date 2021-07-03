@@ -1,18 +1,14 @@
-mod random_chords;
-mod random_notes;
+mod music;
 mod widget;
 
 use cursive::traits::*;
-use cursive::views::{
-    BoxedView, Button, Checkbox, Dialog, DummyView, EditView, LinearLayout, ListView, NamedView,
-    ResizedView, SelectView, TextView, ViewRef,
-};
+use cursive::views::{BoxedView, Dialog, LinearLayout, NamedView, ResizedView, SelectView};
 use cursive::Cursive;
 
 use std::cmp::PartialEq;
 use std::fmt;
 
-use crate::generator::{self, MusicChordTypes};
+use crate::generator;
 
 /// 頁面列表。
 #[derive(PartialEq)]
@@ -143,10 +139,10 @@ impl AppInterface {
             Pages::Empty => None,
             Pages::Quit => None,
             Pages::Start => Some(AppInterface::get_start_page()),
-            Pages::RandomNotes => Some(random_notes::main()),
-            Pages::RandomChords => Some(random_chords::main()),
-            Pages::RandomKeys => Some(AppInterface::get_random_keys_generator()),
-            Pages::RandomModes => Some(AppInterface::get_random_modes_generator()),
+            Pages::RandomNotes => Some(music::random_notes::main()),
+            Pages::RandomChords => Some(music::random_chords::main()),
+            Pages::RandomKeys => Some(music::random_keys::main()),
+            Pages::RandomModes => Some(music::random_modes::main()),
             Pages::RandomMeter => Some(AppInterface::get_random_meter_generator()),
             Pages::RandomTempo => Some(AppInterface::get_random_tempo_generator()),
             // Pages::RandomTitle => Some(AppInterface::get_random_title_generator()),
@@ -173,7 +169,7 @@ impl AppInterface {
             .button("取消", |s| {
                 s.pop_layer();
             })
-            .title("Quit");
+            .title("訊息");
 
         siv.add_layer(message);
     }
@@ -182,28 +178,6 @@ impl AppInterface {
         let content = Dialog::text("welcome to SomeIdea!").full_screen();
 
         BoxedView::boxed(content)
-    }
-
-    fn get_random_keys_generator() -> BoxedView {
-        let info = Dialog::text("this is what you got!");
-        let result = generator::get_random_keys();
-        let layout = LinearLayout::vertical()
-            .child(info)
-            .child(Dialog::text(format!("You key is: {}", result)).full_height())
-            .full_screen();
-
-        BoxedView::boxed(layout)
-    }
-
-    fn get_random_modes_generator() -> BoxedView {
-        let info = Dialog::text("this is what you got!");
-        let result = generator::get_random_modes();
-        let layout = LinearLayout::vertical()
-            .child(info)
-            .child(Dialog::text(format!("You modes is: {}", result)).full_height())
-            .full_screen();
-
-        BoxedView::boxed(layout)
     }
 
     fn get_random_meter_generator() -> BoxedView {
@@ -227,16 +201,4 @@ impl AppInterface {
 
         BoxedView::boxed(layout)
     }
-
-    // fn get_random_title_generator() -> BoxedView {
-    //     let content = Dialog::text("welcome to SomeIdea use_random_title_generator!").full_screen();
-
-    //     BoxedView::boxed(content)
-    // }
-
-    // fn get_random_idea_generator() -> BoxedView {
-    //     let content = Dialog::text("welcome to SomeIdea use_random_idea_generator!").full_screen();
-
-    //     BoxedView::boxed(content)
-    // }
 }

@@ -39,8 +39,8 @@ impl fmt::Display for MusicChordTypes {
 }
 
 impl MusicChordTypes {
-    pub fn default() -> Vec<MusicChordTypes> {
-        vec![
+    pub fn default() -> [MusicChordTypes; 11] {
+        [
             MusicChordTypes::Major,
             MusicChordTypes::Minor,
             MusicChordTypes::Augmented,
@@ -113,4 +113,8 @@ pub fn get_random_chords(match_list: Vec<MusicChordTypes>, number: usize) -> Str
             random::get_random_items::<&str>(&choose_chords, n).join(", ")
         }
     }
+}
+
+pub fn get_random_chords_by_default() -> String {
+    get_random_chords(MusicChordTypes::default().to_vec(), 8)
 }

@@ -42,8 +42,8 @@ impl fmt::Display for MusicNotes {
 }
 
 impl MusicNotes {
-    pub fn default() -> Vec<MusicNotes> {
-        vec![
+    pub fn default() -> [MusicNotes; 12] {
+        [
             MusicNotes::C,
             MusicNotes::Db,
             MusicNotes::D,
@@ -69,4 +69,8 @@ pub fn get_random_notes(choose_list: Vec<MusicNotes>, number: usize) -> String {
             .reduce(|main, note| format!("{}, {}", main, note))
             .unwrap(),
     }
+}
+
+pub fn get_random_notes_by_default() -> String {
+    get_random_notes(MusicNotes::default().to_vec(), 8)
 }
